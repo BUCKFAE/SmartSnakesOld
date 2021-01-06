@@ -11,6 +11,7 @@ def main():
 
     # Initializing pygame
     pygame.init()
+    pygame.display.set_caption('Smart Snakes - Buckfae')
 
     # Setting up the screen
     screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
@@ -58,7 +59,7 @@ def main():
 
         # Pushing changes to screen
         pygame.display.flip()
-        clock.tick(20)
+        clock.tick(15)
 
 if __name__ == "__main__":
     print("SmartSnakes - by Buckfae")

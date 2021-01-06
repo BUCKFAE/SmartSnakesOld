@@ -1,5 +1,5 @@
 """Snake"""
-
+import random
 import pygame
 
 class Snake(pygame.sprite.Sprite):
@@ -13,6 +13,9 @@ class Snake(pygame.sprite.Sprite):
         self.surfaces = []
         self.rectangles = []
 
+        # 0 -> UP, 1 -> RIGHT, 2 -> DOWN, 3 -> LEFT
+        self.facing = 2
+
         # Crating the body pieces
         for current_id in range(0, 5):
             current_surface = pygame.Surface((10, 10))
@@ -22,8 +25,13 @@ class Snake(pygame.sprite.Sprite):
 
     def update(self):
         """Updates Snake position"""
-        for current_rectangle in self.rectangles:
-            current_rectangle.move_ip(0, 10)
+        del self.rectangles[0]
+        self.rectangles.insert(len(self.rectangles) - 1, self.rectangles[-1].copy())
+
+        if random.getrandbits(1):
+            self.rectangles[-1].move_ip(10, 0)
+        else:
+            self.rectangles[-1].move_ip(0, 10)
 
     def get_head(self):
         """Returns the head of the snake"""
