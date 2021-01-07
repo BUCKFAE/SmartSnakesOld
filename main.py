@@ -1,10 +1,12 @@
 """Main"""
 
+import random
 import pygame
 from pygame.locals import KEYDOWN, K_ESCAPE, QUIT
 
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT
 from snake import Snake
+from directions import RelativeDirections
 
 def main():
     """Entry point of the program"""
@@ -43,7 +45,8 @@ def main():
                 running = False
 
         # Updating the snake position
-        snake.update()
+        random_move = random.choice(list(RelativeDirections))
+        snake.update(random_move)
 
         # Setting backround color
         screen.fill(("#16a085"))
