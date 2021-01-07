@@ -1,8 +1,7 @@
 """Main"""
 
-import random
 import pygame
-from pygame.locals import KEYDOWN, K_ESCAPE, QUIT
+from pygame.locals import KEYDOWN, K_ESCAPE, QUIT, K_UP, K_LEFT, K_RIGHT
 
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT
 from snake import Snake
@@ -30,6 +29,9 @@ def main():
     # Main loop
     while running:
 
+        # Default move
+        next_move = RelativeDirections.AHEAD
+
         # Event queue
         for event in pygame.event.get():
 
@@ -40,13 +42,20 @@ def main():
                 if event.key == K_ESCAPE:
                     running = False
 
+                # Movement
+                if event.key == K_UP:
+                    next_move = RelativeDirections.AHEAD
+                if event.key == K_LEFT:
+                    next_move = RelativeDirections.LEFT
+                if event.key == K_RIGHT:
+                    next_move = RelativeDirections.RIGHT
+
             # Quit
             if event.type == QUIT:
                 running = False
 
         # Updating the snake position
-        random_move = random.choice(list(RelativeDirections))
-        snake.update(random_move)
+        snake.update(next_move)
 
         # Setting backround color
         screen.fill(("#16a085"))

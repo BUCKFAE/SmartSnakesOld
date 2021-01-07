@@ -32,18 +32,18 @@ class Snake(pygame.sprite.Sprite):
         # Getting the absolute direction of the move
         absolute_move = get_absolute_direction(self.facing, relative_direction)
 
-        # Warning: The directions are probably wrong, will fix this asap
+        # Moving the snake
         if absolute_move == AbsoluteDirections.UP:
-            self.rectangles[-1].move_ip(-10, 0)
+            self.rectangles[-1].move_ip(0, -10)
             self.facing = AbsoluteDirections.UP
         if absolute_move == AbsoluteDirections.RIGHT:
-            self.rectangles[-1].move_ip(0, 10)
+            self.rectangles[-1].move_ip(10, 0)
             self.facing = AbsoluteDirections.RIGHT
         if absolute_move == AbsoluteDirections.DOWN:
-            self.rectangles[-1].move_ip(10, 0)
+            self.rectangles[-1].move_ip(0, 10)
             self.facing = AbsoluteDirections.DOWN
         if absolute_move == AbsoluteDirections.LEFT:
-            self.rectangles[-1].move_ip(0, -10)
+            self.rectangles[-1].move_ip(-10, 0)
             self.facing = AbsoluteDirections.LEFT
 
     def get_head(self):
