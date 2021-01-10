@@ -35,7 +35,7 @@ class Snake(pygame.sprite.Sprite):
         self.facing = AbsoluteDirections.DOWN
 
         # Crating the body pieces
-        for current_id in range(3, -1, -1):
+        for current_id in range(10, -1, -1):
             current_surface = pygame.Surface((10, 10))
             current_surface.fill(("#272b30"))
             self.surfaces.append(current_surface)
