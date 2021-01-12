@@ -28,6 +28,9 @@ def main():
     # Creating initial population
     brains = []
 
+    # Framerate
+    current_speed = 30
+
     # Creating all brains of the initial population
     for current_id in range(0, POOL_SIZE):
         current_brain_moves = []
@@ -124,13 +127,16 @@ def main():
                         if event.key == K_ESCAPE:
                             running = False
 
-                        # Movement
+                        # Changing speed
                         if event.key == K_UP:
-                            next_move = RelativeDirections.AHEAD
+                            current_speed = 30
+                            print("Speed reset to 30 FPS!")
                         if event.key == K_LEFT:
-                            next_move = RelativeDirections.LEFT
+                            current_speed /= 2
+                            print("Speed is now {} FPS".format(current_speed))
                         if event.key == K_RIGHT:
-                            next_move = RelativeDirections.RIGHT
+                            current_speed *= 2
+                            print("Speed is now {} FPS".format(current_speed))
 
                     # Quit
                     if event.type == QUIT:
@@ -171,7 +177,7 @@ def main():
 
                 # Pushing changes to screen
                 pygame.display.flip()
-                clock.tick(10000)
+                clock.tick(current_speed)
 
         # Increasing generation counter
         current_generation += 1
