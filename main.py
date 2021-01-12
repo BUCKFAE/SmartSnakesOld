@@ -185,7 +185,7 @@ def main():
                 snake_id_surface = display_font.render(snake_id_text, True, (0, 0, 0))
                 snake_score_text = "Score: {}".format(current_brain['score'])
                 snake_score_surface = display_font.render(snake_score_text, True, (0, 0, 0))
-                speed_text = "Speed: {} FPS".format(current_speed)
+                speed_text = "Speed: {} FPS".format(int(current_speed))
                 speed_surface = display_font.render(speed_text, True, (0, 0, 0))
 
                 # Drawing info text to the screen
