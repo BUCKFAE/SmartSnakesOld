@@ -14,6 +14,9 @@ def main():
 
     # Initializing pygame
     pygame.init()
+    pygame.font.init()
+    display_font = pygame.font.SysFont('bahnschrift', 15, bold=True)
+
     pygame.display.set_caption('Smart Snakes - Buckfae')
 
     # Setting up the screen
@@ -42,7 +45,7 @@ def main():
 
     # ID of the current generation
     current_generation = 0
-
+    print(pygame.font.get_fonts())
     # Main loop
     while True:
 
@@ -174,6 +177,22 @@ def main():
                         or snake_head[1].center[0] > SCREEN_WIDTH \
                         or snake_head[1].center[1] > SCREEN_HEIGHT:
                     alive = False
+
+                # Creating info text
+                generation_text = "Generation: {}".format(current_generation)
+                generation_surface = display_font.render(generation_text, True, (0, 0, 0))
+                snake_id_text = "Snake ID: {}".format(current_brain['id'])
+                snake_id_surface = display_font.render(snake_id_text, True, (0, 0, 0))
+                snake_score_text = "Score: {}".format(current_brain['score'])
+                snake_score_surface = display_font.render(snake_score_text, True, (0, 0, 0))
+                speed_text = "Speed: {} FPS".format(current_speed)
+                speed_surface = display_font.render(speed_text, True, (0, 0, 0))
+
+                # Drawing info text to the screen
+                screen.blit(generation_surface, (0, 0))
+                screen.blit(snake_id_surface, (0, 20))
+                screen.blit(snake_score_surface, (0, 40))
+                screen.blit(speed_surface, (0, 60))
 
                 # Pushing changes to screen
                 pygame.display.flip()
