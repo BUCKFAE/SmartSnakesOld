@@ -2,7 +2,7 @@
 import random
 import pygame
 from directions import AbsoluteDirections, get_absolute_direction
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, RANDOM_SEED
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, RANDOM_SEED, MAXIMUM_STEP_REWARD
 
 
 class Snake(pygame.sprite.Sprite):
@@ -49,10 +49,14 @@ class Snake(pygame.sprite.Sprite):
             self.surfaces.append(current_surface)
             self.rectangles.append(current_surface.get_rect(center=(10, current_id * 10)))
 
+        # Moves made since last time on food
+        self.move_counter = 0
+
     def update(self, relative_direction):
         """Updates Snake position"""
 
         score = 0
+        self.move_counter += 1
 
         # If we are on food tile
         if self.rectangles[0].colliderect(self.food_rectangle):
@@ -63,7 +67,8 @@ class Snake(pygame.sprite.Sprite):
             score += 500
         else:
             del self.rectangles[-1]
-            score += 1
+            if self.move_counter < MAXIMUM_STEP_REWARD:
+                score += 1
 
         # Extending the snake
         self.rectangles.insert(0, self.rectangles[0].copy())
@@ -104,3 +109,4 @@ class Snake(pygame.sprite.Sprite):
         food_x = food_position[0]
         food_y = food_position[1]
         self.food_rectangle = self.food_surface.get_rect(center=(food_x, food_y))
+        self.move_counter = 0
