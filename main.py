@@ -4,9 +4,10 @@ import random
 import pygame
 from pygame.locals import KEYDOWN, K_ESCAPE, QUIT, K_UP, K_LEFT, K_RIGHT
 
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, POOL_SIZE, MOVE_ARRAY_LENGTH
 from snake import Snake
 from directions import RelativeDirections
+
 
 def main():
     """Entry point of the program"""
@@ -21,59 +22,89 @@ def main():
     # Clock
     clock = pygame.time.Clock()
 
-    # Creating the snake
-    snake = Snake()
-
     # Variable that controls the main loop
     running = True
 
     # Creating initial population
     brains = []
 
-    for current_id in range(0, 100):
+    # Creating all brains of the initial population
+    for current_id in range(0, POOL_SIZE):
         current_brain_moves = []
         print("Creating brain {}".format(current_id))
-        for _ in range(0, 10_000):
+        for _ in range(0, MOVE_ARRAY_LENGTH):
             current_brain_moves.append(random.choice(list(RelativeDirections)))
         current_brain = {'id': current_id, 'moves': current_brain_moves, 'score': 0}
         brains.append(current_brain)
 
+    # ID of the current generation
+    current_generation = 0
 
     # Main loop
-    for current_generation in range(0, 1_000_000):
+    while True:
 
-        print("Current Generation: {}".format(current_generation))
-        
+        # Exit condition
+        if not running:
+            break
+
         # Crossover
         if not current_generation == 0:
-            new_pool = []
-            avg = 0
-            for current_brain in brains:
-                avg += current_brain['score']
-                for i in range(0, current_brain['score']):
-                    new_pool.append(current_brain)
-            avg /= len(brains)
 
-            print("Avg: {}".format(avg))
+            # Stores the new gene pool
+            new_pool = []
+
+            # Average score of the previous population
+            avg_sore = 0
+
+            # Evaluating all brains
+            for current_brain in brains:
+                avg_sore += current_brain['score']
+                for _ in range(0, current_brain['score']):
+                    new_pool.append(current_brain)
+
+            # Calculating the average score
+            avg_sore /= len(brains)
+
+            print("Average score generation {}: {}".format(current_generation, avg_sore))
+
+            # Stores how many new brains we need to create
             brains_to_create = len(brains)
+
+            # Clearing the old brains
             brains = []
+
+            # Creating new brains
             for current_brain in range(0, brains_to_create):
+
+                # Random break point
                 break_point = random.randint(0, 10_000)
+
+                # Choosing parents
                 first_brain = random.choice(new_pool)
                 second_brain = random.choice(new_pool)
+
+                # Creating moves for the new brains
                 new_moves = first_brain['moves'][:break_point] + second_brain['moves'][break_point:]
+
+                # Mutating moves
                 for move_id in range(0, len(new_moves)):
                     if random.randint(0, 100) < 2:
                         new_moves[move_id] = random.choice(list(RelativeDirections))
-                new_brain = {'id': current_brain, 'moves': new_moves, 'score': 0}
-                brains.append(new_brain)
 
+                # Creating the new brain
+                brains.append({'id': current_brain, 'moves': new_moves, 'score': 0})
 
+        # Evaluating all brains
         for current_brain in brains:
 
             alive = True
             snake = Snake()
 
+            # Exit condition
+            if not running:
+                break
+
+            # Moving the snake
             for current_move in current_brain['moves']:
 
                 # Snake died last move
@@ -82,10 +113,6 @@ def main():
 
                 # Getting the next move
                 next_move = current_move
-     
-                # Exit conditiion - TODO
-                if not running:
-                    break
 
                 # Event queue
                 for event in pygame.event.get():
@@ -109,11 +136,15 @@ def main():
                     if event.type == QUIT:
                         running = False
 
+                # Exit condition
+                if not running:
+                    break
+
                 # Updating the snake position
                 current_brain['score'] += snake.update(next_move)
 
-                # Setting backround color
-                screen.fill(("#16a085"))
+                # Setting background color
+                screen.fill("#16a085")
 
                 # Getting the different parts of the snake
                 snake_head = snake.get_head()
@@ -140,7 +171,11 @@ def main():
 
                 # Pushing changes to screen
                 pygame.display.flip()
-                clock.tick(10000000000)
+                clock.tick(10000)
+
+        # Increasing generation counter
+        current_generation += 1
+
 
 if __name__ == "__main__":
     print("SmartSnakes - by Buckfae")

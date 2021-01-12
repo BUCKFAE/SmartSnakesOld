@@ -2,10 +2,12 @@
 import random
 import pygame
 from directions import AbsoluteDirections, get_absolute_direction
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, RANOM_SEED
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, RANDOM_SEED
+
 
 class Snake(pygame.sprite.Sprite):
     """Represents the snake on the board"""
+
     def __init__(self):
         """Init"""
 
@@ -15,31 +17,37 @@ class Snake(pygame.sprite.Sprite):
         self.surfaces = []
         self.rectangles = []
 
-        # Stores food positons
+        # Stores food positions
         self.food_positions = []
 
-        random.seed(RANOM_SEED)
+        # Setting the seed
+        random.seed(RANDOM_SEED)
 
-        # Creating the food
+        # Creating the food positions
         for _ in range(0, 100):
-            randx = round(random.randint(0, SCREEN_WIDTH), -1)
-            randy = round(random.randint(0, SCREEN_HEIGHT), -1)
-            self.food_positions.append((randx, randy))
+            rand_x = round(random.randint(0, SCREEN_WIDTH), -1)
+            rand_y = round(random.randint(0, SCREEN_HEIGHT), -1)
+            self.food_positions.append((rand_x, rand_y))
+
+        # Initial food surface / rectangle
+        self.food_surface = pygame.Surface((10, 10))
+        self.food_surface.fill("#ed0f46")
+        self.food_rectangle = self.food_surface.get_rect(
+            center=(self.food_positions[0][0],
+                    self.food_positions[0][1]))
 
         # Id of the current food
-        self.current_food = 0
+        self.current_food = 1
 
-        self.create_food_at(self.food_positions[0])
-
-        # 0 -> UP, 1 -> RIGHT, 2 -> DOWN, 3 -> LEFT
+        # Direction the snake faces at startup
         self.facing = AbsoluteDirections.DOWN
 
         # Crating the body pieces
         for current_id in range(10, -1, -1):
             current_surface = pygame.Surface((10, 10))
-            current_surface.fill(("#272b30"))
+            current_surface.fill("#272b30")
             self.surfaces.append(current_surface)
-            self.rectangles.append(current_surface.get_rect(center = (10, current_id * 10)))
+            self.rectangles.append(current_surface.get_rect(center=(10, current_id * 10)))
 
     def update(self, relative_direction):
         """Updates Snake position"""
@@ -93,8 +101,6 @@ class Snake(pygame.sprite.Sprite):
 
     def create_food_at(self, food_position):
         """Sets the food to be at the given coordinates"""
-        self.food_surface = pygame.Surface((10, 10))
-        self.food_surface.fill("#ed0f46")
-        foodx = food_position[0]
-        foody = food_position[1]
-        self.food_rectangle = self.food_surface.get_rect(center = (foodx, foody))
+        food_x = food_position[0]
+        food_y = food_position[1]
+        self.food_rectangle = self.food_surface.get_rect(center=(food_x, food_y))
