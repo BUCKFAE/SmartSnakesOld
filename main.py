@@ -45,7 +45,7 @@ def main():
 
     # ID of the current generation
     current_generation = 0
-    print(pygame.font.get_fonts())
+
     # Main loop
     while True:
 
