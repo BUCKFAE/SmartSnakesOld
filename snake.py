@@ -3,11 +3,14 @@
 # Setting pygame window position
 import os
 from typing import Tuple
+
+from tf_agents.specs.tensor_spec import to_array_spec
 os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (100, 100)
 
 # Other imports
 import random
 import pygame
+import numpy as np
 from directions import AbsoluteDirections, get_absolute_direction
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, MAXIMUM_STEP_REWARD
 
@@ -49,6 +52,7 @@ class Snake(pygame.sprite.Sprite):
 
         # Moves made since last time on food
         self.move_counter = 0
+
 
     def update(self, relative_direction) -> Tuple[int, bool]:
         """Updates Snake position"""
@@ -98,8 +102,6 @@ class Snake(pygame.sprite.Sprite):
         if self.rectangles[0][0] > SCREEN_WIDTH - 10: is_alive = False
         if self.rectangles[0][1] > SCREEN_HEIGHT - 10: is_alive = False
     
-        print(self.to_network_input())
-
 
         return score, is_alive
 
@@ -155,4 +157,4 @@ class Snake(pygame.sprite.Sprite):
 
             field.append(curr)
 
-        return [j for sub in field for j in sub]
+        return np.array([j for sub in field for j in sub], dtype=np.float32)

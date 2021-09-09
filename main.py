@@ -1,4 +1,7 @@
 """Main"""
+from __future__ import absolute_import, division, print_function
+
+from SnakeEnv import SnakeEnv
 
 import random
 import pygame
@@ -9,6 +12,30 @@ from settings import SCREEN_WIDTH, SCREEN_HEIGHT
 from snake import Snake
 from directions import RelativeDirections
 
+import base64
+import imageio
+import IPython
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+import PIL.Image
+import pyvirtualdisplay
+
+import tensorflow as tf
+
+from tf_agents.agents.dqn import dqn_agent
+from tf_agents.environments import suite_gym
+from tf_agents.environments import tf_py_environment
+from tf_agents.environments import utils
+from tf_agents.specs import array_spec
+from tf_agents.eval import metric_utils
+from tf_agents.metrics import tf_metrics
+from tf_agents.networks import sequential
+from tf_agents.policies import random_tf_policy
+from tf_agents.replay_buffers import tf_uniform_replay_buffer
+from tf_agents.trajectories import trajectory
+from tf_agents.specs import tensor_spec
+from tf_agents.utils import common
 
 def main():
     """Entry point of the program"""
@@ -32,8 +59,15 @@ def main():
     # ID of the current generation
     current_generation = 0
 
-    snake = Snake()
+    board_size = int(((SCREEN_WIDTH - 10) / 10) * ((SCREEN_WIDTH - 10) / 10))
 
+    print(f"{board_size=}")
+
+    env = SnakeEnv(board_size=board_size, screen=screen)
+    utils.validate_py_environment(env, episodes=5)
+
+    train_env = tf_py_environment.TFPyEnvironment(env)
+    eval_env = tf_py_environment.TFPyEnvironment(env)
 
     # Main loop
     while True:
@@ -75,39 +109,11 @@ def main():
         print(f"Next move: {next_move}")
 
 
-
-        score, is_alive = snake.update(next_move)
-        print(f"{score=}, {is_alive=}")
-        draw_snake(screen=screen, snake=snake)
-
-        # End of a generation
-        if not is_alive:
-            print(f"Snake died with a score of {score}")
-            running = False
-
         clock.tick(current_speed)
 
         # Increasing generation counter
         current_generation += 1
 
-
-def draw_snake(screen, snake) -> None:
-
-    screen.fill("#16a085")
-
-    # Getting the different parts of the snake
-    snake_head = snake.get_head()
-    snake_body = snake.get_body()
-    snake_food = snake.get_food()
-
-    # Drawing the snake
-    screen.blit(snake_head[0], snake_head[1])
-    for snake_body_piece in snake_body:
-        screen.blit(snake_body_piece[0], snake_body_piece[1])
-
-    # Drawing the food
-    screen.blit(snake_food[0], snake_food[1])
-    pygame.display.flip()
 
 if __name__ == "__main__":
     print("SmartSnakes - by Buckfae")
