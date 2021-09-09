@@ -1,8 +1,15 @@
 """Snake"""
+
+# Setting pygame window position
+import os
+from typing import Tuple
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (100, 100)
+
+# Other imports
 import random
 import pygame
 from directions import AbsoluteDirections, get_absolute_direction
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, RANDOM_SEED, MAXIMUM_STEP_REWARD
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, MAXIMUM_STEP_REWARD
 
 
 class Snake(pygame.sprite.Sprite):
@@ -17,42 +24,33 @@ class Snake(pygame.sprite.Sprite):
         self.surfaces = []
         self.rectangles = []
 
-        # Stores food positions
-        self.food_positions = []
-
-        # Setting the seed
-        random.seed(RANDOM_SEED)
-
-        # Creating the food positions
-        for _ in range(0, 100):
-            rand_x = round(random.randint(0, SCREEN_WIDTH), -1)
-            rand_y = round(random.randint(0, SCREEN_HEIGHT), -1)
-            self.food_positions.append((rand_x, rand_y))
-
-        # Initial food surface / rectangle
-        self.food_surface = pygame.Surface((10, 10))
-        self.food_surface.fill("#ed0f46")
-        self.food_rectangle = self.food_surface.get_rect(
-            center=(self.food_positions[0][0],
-                    self.food_positions[0][1]))
-
         # Id of the current food
         self.current_food = 1
 
         # Direction the snake faces at startup
         self.facing = AbsoluteDirections.DOWN
 
+        starting_pos = int(SCREEN_WIDTH / 2)
+        print(f"Starting pos x: {starting_pos}")
+
         # Crating the body pieces
-        for current_id in range(10, -1, -1):
+        for current_id in range(2, -1, -1):
             current_surface = pygame.Surface((10, 10))
             current_surface.fill("#272b30")
             self.surfaces.append(current_surface)
-            self.rectangles.append(current_surface.get_rect(center=(10, current_id * 10)))
+            self.rectangles.append(current_surface.get_rect(center=(starting_pos, current_id * 10)))
+
+        # Initial food surface / rectangle
+        self.food_surface = pygame.Surface((10, 10))
+        self.food_surface.fill("#ed0f46")
+
+        # Spawning food
+        self.spawn_food()
 
         # Moves made since last time on food
         self.move_counter = 0
 
-    def update(self, relative_direction):
+    def update(self, relative_direction) -> Tuple[int, bool]:
         """Updates Snake position"""
 
         score = 0
@@ -60,8 +58,11 @@ class Snake(pygame.sprite.Sprite):
 
         # If we are on food tile
         if self.rectangles[0].colliderect(self.food_rectangle):
+
+            # TODO: We finished the game!
+
             self.current_food += 1
-            self.create_food_at(self.food_positions[self.current_food])
+            self.spawn_food()
             self.surfaces.append(pygame.Surface((10, 10)))
             self.surfaces[-1].fill("#272b30")
             score += 500
@@ -90,7 +91,17 @@ class Snake(pygame.sprite.Sprite):
             self.rectangles[0].move_ip(-10, 0)
             self.facing = AbsoluteDirections.LEFT
 
-        return score
+        # Checks if the snake is alive
+        is_alive = True        
+        if self.rectangles[0] in self.rectangles[1:]: is_alive = False
+        if any([i < 0 for i in self.rectangles[0][:2]]): is_alive = False
+        if self.rectangles[0][0] > SCREEN_WIDTH - 10: is_alive = False
+        if self.rectangles[0][1] > SCREEN_HEIGHT - 10: is_alive = False
+    
+        print(self.to_network_input())
+
+
+        return score, is_alive
 
     def get_head(self):
         """Returns the head of the snake"""
@@ -100,13 +111,48 @@ class Snake(pygame.sprite.Sprite):
         """Returns the body of the snake"""
         return list(zip(self.surfaces[1:], self.rectangles[1:]))
 
+    def spawn_food(self):
+        """Creates food in a random location"""
+        while True:
+
+            lower_x = 0
+            upper_x = int((SCREEN_WIDTH - 20) / 10)
+
+            lower_y = 0
+            upper_y = int((SCREEN_HEIGHT - 20) / 10)
+
+            food_x = random.randint(lower_x, upper_x)
+            food_y = random.randint(lower_y, upper_y)
+
+            food_x_trans = food_x * 10 + 5
+            food_y_trans = food_y * 10 + 5
+
+            self.food_pos = (food_x_trans, food_y_trans)
+            print(f"Spawned new food at: {self.food_pos=}")
+            if self.food_pos not in list(self.get_head()) + self.get_body():
+                break
+
+        food_x_rect = self.food_pos[0] + 5
+        food_y_rect = self.food_pos[1] + 5
+
+        self.food_rectangle = self.food_surface.get_rect(center=((food_x_rect, food_y_rect)))
+        self.move_counter = 0
+
     def get_food(self):
         """Returns the food"""
         return self.food_surface, self.food_rectangle
 
-    def create_food_at(self, food_position):
-        """Sets the food to be at the given coordinates"""
-        food_x = food_position[0]
-        food_y = food_position[1]
-        self.food_rectangle = self.food_surface.get_rect(center=(food_x, food_y))
-        self.move_counter = 0
+    def to_network_input(self):
+        squares = [(rect[0], rect[1]) for rect in self.rectangles]
+        field = []
+        for col in range(5, SCREEN_HEIGHT - 10, 10):
+            curr = []
+            for row in range(5, SCREEN_WIDTH - 10, 10):
+                if (row, col) == self.food_pos:
+                    curr += [0.5]
+                else:
+                    curr += [1.0] if (row, col) in squares else [0.0]
+
+            field.append(curr)
+
+        return [j for sub in field for j in sub]

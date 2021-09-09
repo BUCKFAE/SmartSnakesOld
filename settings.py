@@ -1,21 +1,16 @@
 """Settings"""
 
 # Screen Settings
-SCREEN_WIDTH = 600
-SCREEN_HEIGHT = 400
+SCREEN_WIDTH = 60
+SCREEN_HEIGHT = 60
 
-# Amount of snakes per population
-POOL_SIZE = 200
+# Reward for landing on food
+FOOD_REWARD = 100
 
 # For how many steps the snake will be rewarded (resets after hitting food)
+STEP_REWARD = 1
 MAXIMUM_STEP_REWARD = 50
 
 # Mutation rate in percent
-MUTATION_RATE = 7
-
-# Amount of Moves a Snake can make before it dies
-MOVE_ARRAY_LENGTH = 10_000
-
-# Random seed to ensure the food is always placed at the same spot
-RANDOM_SEED = 1
+MUTATION_RATE = 2
 
