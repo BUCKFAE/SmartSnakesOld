@@ -23,7 +23,7 @@ class SnakeEnv(py_environment.PyEnvironment):
 
   def __init__(self, board_size, screen):
     self._action_spec = array_spec.BoundedArraySpec(
-        shape=(), dtype=np.int32, minimum=-1, maximum=1, name='action')
+        shape=(), dtype=np.int32, minimum=0, maximum=2, name='action')
     self._observation_spec = array_spec.BoundedArraySpec(
         shape=(board_size,), dtype=np.float32, minimum=0, name='observation')
     self._episode_ended = False
@@ -50,36 +50,39 @@ class SnakeEnv(py_environment.PyEnvironment):
       # a new episode.
       return self.reset()
 
-    if action in [-1, 0, 1]:
-      reward, is_alive = self.snake.update(action)
+    if action in [0, 1, 2]:
+      reward, is_alive = self.snake.update(action - 1)
       if not is_alive:
           self._episode_ended = True
     else:
       raise ValueError('`action` should be 0 or 1.')
 
     # Drawing the snake
-    _draw_snake(screen=self.screen, snake=self.snake)
+    #self.draw_snake()
 
     if self._episode_ended:
       return ts.termination(self.snake.to_network_input(), reward)
     else:
-      return ts.transition(self.snake.to_network_input(), reward=0.0, discount=1.0)
+      return ts.transition(self.snake.to_network_input(), reward=reward, discount=1.0)
 
 
-def _draw_snake(screen, snake) -> None:
+  def draw_snake(self) -> None:
 
-    screen.fill("#16a085")
+        screen = self.screen
+        snake=self.snake
 
-    # Getting the different parts of the snake
-    snake_head = snake.get_head()
-    snake_body = snake.get_body()
-    snake_food = snake.get_food()
+        screen.fill("#16a085")
 
-    # Drawing the snake
-    screen.blit(snake_head[0], snake_head[1])
-    for snake_body_piece in snake_body:
-        screen.blit(snake_body_piece[0], snake_body_piece[1])
+        # Getting the different parts of the snake
+        snake_head = snake.get_head()
+        snake_body = snake.get_body()
+        snake_food = snake.get_food()
 
-    # Drawing the food
-    screen.blit(snake_food[0], snake_food[1])
-    pygame.display.flip()
+        # Drawing the snake
+        screen.blit(snake_head[0], snake_head[1])
+        for snake_body_piece in snake_body:
+            screen.blit(snake_body_piece[0], snake_body_piece[1])
+
+        # Drawing the food
+        screen.blit(snake_food[0], snake_food[1])
+        pygame.display.flip()
