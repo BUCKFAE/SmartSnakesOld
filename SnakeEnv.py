@@ -58,7 +58,7 @@ class SnakeEnv(py_environment.PyEnvironment):
       raise ValueError('`action` should be 0 or 1.')
 
     # Drawing the snake
-    #self.draw_snake()
+    self.draw_snake()
 
     if self._episode_ended:
       return ts.termination(self.snake.to_network_input(), reward)

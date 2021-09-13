@@ -3,9 +3,9 @@
 # Setting pygame window position
 import os
 from typing import Tuple
+import sys
 
-from tf_agents.specs.tensor_spec import to_array_spec
-os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (100, 100)
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (200, 200)
 
 # Other imports
 import random
@@ -148,12 +148,12 @@ class Snake(pygame.sprite.Sprite):
             curr = []
             for row in range(5, SCREEN_WIDTH - 10, 10):
                 if (row, col) == self.food_pos:
-                    curr += [0.5]
+                    curr += [1.0]
                 else:
                     if (row, col) == squares[0]:
-                        curr += [0.75]
+                        curr += [0.5]
                     else:
-                        curr += [1.0] if (row, col) in squares else [0.0]
+                        curr += [0.25] if (row, col) in squares else [0.0]
 
             field.append(curr)
 
